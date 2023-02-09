@@ -1,6 +1,5 @@
 package az.iktlab.flights_and_bookings.entity;
 
-import az.iktlab.flights_and_bookings.model.Booking;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -24,8 +24,13 @@ public class PassengerEntity {
     private String name;
     @Column(nullable = false)
     private String surname;
-    private Long bookingId;
-    @Column(unique = true,nullable = false)
+
+    @OneToMany(targetEntity = BookingEntity.class)
+    @JoinTable(name = "passenger_bookings",
+    joinColumns = @JoinColumn(name = "passenger_id"),
+    inverseJoinColumns = @JoinColumn(name = "booking_id"))
+    private List<BookingEntity> bookings;
+    @Column(unique = true,nullable = false, name = "passport_number")
     private String passportNumber;
     @Column(name = "created_at")
     @CreationTimestamp

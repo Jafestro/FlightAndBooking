@@ -1,16 +1,13 @@
 package az.iktlab.flights_and_bookings.service;
 
 import az.iktlab.flights_and_bookings.entity.FlightEntity;
-import az.iktlab.flights_and_bookings.model.Flight;
 import az.iktlab.flights_and_bookings.model.FlightDto;
 import az.iktlab.flights_and_bookings.repository.FlightRepo;
+import az.iktlab.flights_and_bookings.repository.PassengerRepo;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,10 +27,13 @@ public class FlightService {
 //    }
 
     private final FlightRepo flightRepo;
+    private final PassengerRepo passengerRepo;
 
-    public FlightService(FlightRepo flightRepo) {
+    public FlightService(FlightRepo flightRepo, PassengerRepo passengerRepo) {
         this.flightRepo = flightRepo;
+        this.passengerRepo = passengerRepo;
     }
+
 
     public List<FlightDto> getAllFlights(){
         return flightRepo.findAll()
@@ -55,12 +55,22 @@ public class FlightService {
         return flightRepo.findAll()
                 .stream()
                 .map(this::buildFlightDto)
-                .filter(it -> it.getArrival().equals(to) && it.getDate().equals(date) && it.getAvailableSeats() >= passCount && it.getDeparture().equals(from))
+                .filter(it -> it.getArrival().equals(to)
+                        && it.getDate().equals(date)
+                        && it.getAvailableSeats() >= passCount
+                        && it.getDeparture().equals(from))
                 .collect(Collectors.toList());
     }
 
     public List<FlightDto> showMyFlights(@PathVariable("passportNumber") String passportNumber){
-        return null;
+       var entity = passengerRepo.findByPassportNumber(passportNumber)
+                .orElseThrow(()->new RuntimeException("PASSENGER DOES NOT EXIST."))
+                .getBookings().stream()
+                .map(it-> flightRepo.findById(it.getFlight().getFlightId()))
+                .collect(Collectors.toList());
+       List<FlightEntity> flightEntities = (ArrayList) entity;
+
+        return flightEntities.stream().map(this::buildFlightDto).collect(Collectors.toList());
     }
 
     private FlightDto buildFlightDto(FlightEntity entity){

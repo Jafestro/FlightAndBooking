@@ -1,6 +1,5 @@
 package az.iktlab.flights_and_bookings.entity;
 
-import az.iktlab.flights_and_bookings.model.Flight;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,8 +17,12 @@ import java.time.LocalDateTime;
 public class BookingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "booking_id")
     private Long bookingId;
-    private Long flightId;
+
+    @OneToOne(targetEntity = FlightEntity.class)
+    @JoinColumn(name = "flight_id")
+    private FlightEntity flight;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp
