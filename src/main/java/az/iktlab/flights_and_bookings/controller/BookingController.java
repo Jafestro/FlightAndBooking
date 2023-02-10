@@ -1,5 +1,6 @@
 package az.iktlab.flights_and_bookings.controller;
 
+import az.iktlab.flights_and_bookings.model.BookingDto;
 import az.iktlab.flights_and_bookings.service.BookingService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +19,8 @@ public class BookingController {
     }
 
 
-    @PostMapping("/passportNumber")
-    public void bookFlight(@RequestParam("id") Long id,
-                           @RequestParam("passportNumber") String passportNumber,
-                           @RequestParam("name") String name,
-                           @RequestParam("surname") String surname){
-            bookingService.bookFlight(id,passportNumber,name,surname);
+    @PostMapping("/id")
+    public BookingDto bookFlight(@RequestParam("id") Long flight_Id){
+            return bookingService.bookFlight(flight_Id);
     }
 }
